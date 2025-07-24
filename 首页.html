@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>链接导航首页</title>
+    <!-- 引入Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- Tailwind配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563EB',
+                        secondary: '#64748B',
+                        accent: '#7C3AED',
+                        light: '#F8FAFC',
+                        dark: '#1E293B'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .link-card {
+                @apply bg-white rounded-lg p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5;
+            }
+            .section-title {
+                @apply text-xl font-bold text-gray-800 mb-4 flex items-center gap-2;
+            }
+            .nav-link {
+                @apply flex items-center gap-2 p-2.5 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-gray-700 hover:text-primary;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans text-gray-800">
+    <div id="app">
+        <!-- 顶部导航栏 -->
+        <header class="bg-white shadow-sm sticky top-0 z-10">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white">
+                            <i class="fa fa-link"></i>
+                        </div>
+                        <h1 class="text-xl font-bold">链接导航中心</h1>
+                    </div>
+                    
+                    <nav class="hidden md:flex items-center gap-1">
+                        <a href="首页.html" class="nav-link">
+                            <i class="fa fa-home w-5 text-center"></i>
+                            <span>首页</span>
+                        </a>
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-bookmark w-5 text-center"></i>
+                            <span>收藏</span>
+                        </a>
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-history w-5 text-center"></i>
+                            <span>历史</span>
+                        </a>
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-cog w-5 text-center"></i>
+                            <span>设置</span>
+                        </a>
+                    </nav>
+                    
+                    <button class="md:hidden text-gray-600">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+        
+        <!-- 主内容区 -->
+        <main class="container mx-auto px-4 py-8">
+            <!-- 搜索栏 -->
+            <div class="bg-white rounded-xl p-4 shadow-sm mb-8">
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        placeholder="搜索链接..." 
+                        class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                    >
+                    <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                </div>
+            </div>
+            
+            <!-- 快速访问链接 -->
+            <section class="mb-10">
+                <h2 class="section-title">
+                    <i class="fa fa-star text-yellow-400"></i>
+                    快速访问
+                </h2>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    <a href="#" class="link-card flex flex-col items-center justify-center text-center p-6 group">
+                        <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-3 group-hover:bg-primary group-hover:text-white transition-colors">
+                            <i class="fa fa-dashboard text-xl"></i>
+                        </div>
+                        <span class="font-medium">控制台</span>
+                    </a>
+                    
+                    <a href="#" class="link-card flex flex-col items-center justify-center text-center p-6 group">
+                        <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 mb-3 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                            <i class="fa fa-file-text-o text-xl"></i>
+                        </div>
+                        <span class="font-medium">文档中心</span>
+                    </a>
+                    
+                    <a href="#" class="link-card flex flex-col items-center justify-center text-center p-6 group">
+                        <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-500 mb-3 group-hover:bg-green-500 group-hover:text-white transition-colors">
+                            <i class="fa fa-calendar text-xl"></i>
+                        </div>
+                        <span class="font-medium">日程安排</span>
+                    </a>
+                    
+                    <a href="#" class="link-card flex flex-col items-center justify-center text-center p-6 group">
+                        <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-500 mb-3 group-hover:bg-purple-500 group-hover:text-white transition-colors">
+                            <i class="fa fa-comments-o text-xl"></i>
+                        </div>
+                        <span class="font-medium">消息中心</span>
+                    </a>
+                    
+                    <a href="#" class="link-card flex flex-col items-center justify-center text-center p-6 group">
+                        <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-500 mb-3 group-hover:bg-orange-500 group-hover:text-white transition-colors">
+                            <i class="fa fa-bar-chart text-xl"></i>
+                        </div>
+                        <span class="font-medium">数据分析</span>
+                    </a>
+                    
+                    <a href="#" class="link-card flex flex-col items-center justify-center text-center p-6 group">
+                        <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-500 mb-3 group-hover:bg-red-500 group-hover:text-white transition-colors">
+                            <i class="fa fa-bell-o text-xl"></i>
+                        </div>
+                        <span class="font-medium">通知中心</span>
+                    </a>
+                </div>
+            </section>
+            
+            <!-- 分类链接区域 -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- 第一列分类 -->
+                <div class="space-y-8">
+                    <!-- 学习资源 -->
+                    <section class="bg-white rounded-xl p-6 shadow-sm">
+                        <h2 class="section-title">
+                            <i class="fa fa-graduation-cap text-indigo-500"></i>
+                            学习资源
+                        </h2>
+                        <div class="space-y-1">
+                            <a href="1第一单元 .html" class="nav-link">List1</a>
+                            <a href="2第二单元.html" class="nav-link">List2</a>
+                            <a href="3第三单元.html" class="nav-link">List3</a>
+                            <a href="4第四单元.html" class="nav-link">List4</a>
+                            <a href="5第五单元.html" class="nav-link">List5</a>
+                            <a href="6第六单元.html" class="nav-link">List6</a>
+                            <a href="7第七单元.html" class="nav-link">List7</a>
+                            <a href="8第八单元.html" class="nav-link">List8</a>
+                        </div>
+                    </section>
+                    
+                    <!-- 工具应用 -->
+                    <section class="bg-white rounded-xl p-6 shadow-sm">
+                        <h2 class="section-title">
+                            <i class="fa fa-wrench text-blue-500"></i>
+                            工具应用
+                        </h2>
+                        <div class="space-y-1">
+                            <a href="#" class="nav-link">计算器</a>
+                            <a href="#" class="nav-link">转换器</a>
+                            <a href="#" class="nav-link">生成器</a>
+                            <a href="#" class="nav-link">编辑器</a>
+                            <a href="#" class="nav-link">格式工具</a>
+                            <a href="#" class="nav-link">二维码工具</a>
+                            <a href="#" class="nav-link">压缩工具</a>
+                        </div>
+                    </section>
+                </div>
+                
+                <!-- 第二列分类 -->
+                <div class="space-y-8">
+                    <!-- 项目管理 -->
+                    <section class="bg-white rounded-xl p-6 shadow-sm">
+                        <h2 class="section-title">
+                            <i class="fa fa-tasks text-green-500"></i>
+                            项目管理
+                        </h2>
+                        <div class="space-y-1">
+                            <a href="#" class="nav-link">项目列表</a>
+                            <a href="#" class="nav-link">任务看板</a>
+                            <a href="#" class="nav-link">进度跟踪</a>
+                            <a href="#" class="nav-link">团队成员</a>
+                            <a href="#" class="nav-link">文档协作</a>
+                            <a href="#" class="nav-link">会议记录</a>
+                            <a href="#" class="nav-link">项目报表</a>
+                        </div>
+                    </section>
+                    
+                    <!-- 内容管理 -->
+                    <section class="bg-white rounded-xl p-6 shadow-sm">
+                        <h2 class="section-title">
+                            <i class="fa fa-file-o text-purple-500"></i>
+                            内容管理
+                        </h2>
+                        <div class="space-y-1">
+                            <a href="#" class="nav-link">文章列表</a>
+                            <a href="#" class="nav-link">媒体库</a>
+                            <a href="#" class="nav-link">评论管理</a>
+                            <a href="#" class="nav-link">分类标签</a>
+                            <a href="#" class="nav-link">草稿箱</a>
+                            <a href="#" class="nav-link">已发布</a>
+                            <a href="#" class="nav-link">内容统计</a>
+                            <a href="#" class="nav-link">备份恢复</a>
+                        </div>
+                    </section>
+                </div>
+                
+                <!-- 第三列分类 -->
+                <div class="space-y-8">
+                    <!-- 系统设置 -->
+                    <section class="bg-white rounded-xl p-6 shadow-sm">
+                        <h2 class="section-title">
+                            <i class="fa fa-cogs text-gray-600"></i>
+                            系统设置
+                        </h2>
+                        <div class="space-y-1">
+                            <a href="#" class="nav-link">基本设置</a>
+                            <a href="#" class="nav-link">安全设置</a>
+                            <a href="#" class="nav-link">隐私设置</a>
+                            <a href="#" class="nav-link">通知设置</a>
+                            <a href="#" class="nav-link">账户管理</a>
+                            <a href="#" class="nav-link">权限设置</a>
+                            <a href="#" class="nav-link">数据备份</a>
+                        </div>
+                    </section>
+                    
+                    <!-- 外部链接 -->
+                    <section class="bg-white rounded-xl p-6 shadow-sm">
+                        <h2 class="section-title">
+                            <i class="fa fa-external-link text-orange-500"></i>
+                            外部链接
+                        </h2>
+                        <div class="space-y-1">
+                            <a href="#" class="nav-link">官方网站</a>
+                            <a href="#" class="nav-link">帮助中心</a>
+                            <a href="#" class="nav-link">社区论坛</a>
+                            <a href="#" class="nav-link">开发者文档</a>
+                            <a href="#" class="nav-link">API接口</a>
+                            <a href="#" class="nav-link">合作伙伴</a>
+                            <a href="#" class="nav-link">反馈建议</a>
+                            <a href="#" class="nav-link">关于我们</a>
+                        </div>
+                    </section>
+                    
+                    <!-- 新增链接区域 -->
+                    <section class="bg-white rounded-xl p-6 shadow-sm border-2 border-dashed border-gray-200 hover:border-primary/50 transition-colors">
+                        <div class="text-center py-4">
+                            <button class="text-gray-500 hover:text-primary transition-colors">
+                                <i class="fa fa-plus-circle text-2xl mb-2 block"></i>
+                                <span class="font-medium">添加新链接分类</span>
+                            </button>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+        
+        <!-- 页脚 -->
+        <footer class="bg-white border-t border-gray-200 mt-12 py-6">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-gray-500 text-sm mb-4 md:mb-0">
+                        链接导航中心 &copy; {{ new Date().getFullYear() }}
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="#" class="text-gray-500 hover:text-primary transition-colors">
+                            <i class="fa fa-github text-lg"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-primary transition-colors">
+                            <i class="fa fa-twitter text-lg"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-primary transition-colors">
+                            <i class="fa fa-linkedin text-lg"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // 创建Vue应用
+        const { createApp } = Vue;
+        
+        createApp({
+            data() {
+                return {
+                    // 可以在这里添加需要动态管理的链接数据
+                };
+            },
+            methods: {
+                // 可以添加链接相关的方法，如新增、编辑、删除等
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

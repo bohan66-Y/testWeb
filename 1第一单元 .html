@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>随机抽取30个词语</title>
+    <!-- 引入Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- Tailwind配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        secondary: '#10B981',
+                        neutral: '#64748B',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .word-card {
+                @apply bg-white rounded-lg p-3 shadow-sm border border-gray-100 transition-all hover:shadow-md;
+            }
+            .btn-primary {
+                @apply bg-primary hover:bg-primary/90 text-white font-medium py-2 px-6 rounded-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary/50;
+            }
+            .btn-secondary {
+                @apply bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-6 rounded-lg transition-all;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+    <div id="app" class="container mx-auto px-4 py-8 max-w-5xl">
+        <!-- 头部标题 -->
+         <header class="bg-white shadow-sm sticky top-0 z-10">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white">
+                            <i class="fa fa-link"></i>
+                        </div>
+                        <h1 class="text-xl font-bold">链接导航中心</h1>
+                    </div>
+                    
+                    <nav class="hidden md:flex items-center gap-1">
+                        <a href="首页.html" class="nav-link">
+                            <i class="fa fa-home w-5 text-center"></i>
+                            <span>首页</span>
+                        </a>
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-bookmark w-5 text-center"></i>
+                            <span>收藏</span>
+                        </a>
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-history w-5 text-center"></i>
+                            <span>历史</span>
+                        </a>
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-cog w-5 text-center"></i>
+                            <span>设置</span>
+                        </a>
+                    </nav>
+                    
+                    <button class="md:hidden text-gray-600">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+        <header class="text-center mb-8">
+            <h1 class="text-[clamp(1.8rem,5vw,2.5rem)] font-bold text-gray-800 mb-2">随机词语抽取</h1>
+            <p class="text-gray-600">从词语库中随机抽取30个词语</p>
+        </header>
+        
+        <!-- 控制区域 -->
+        <div class="bg-white rounded-xl p-6 mb-8 shadow-md">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div>
+                    <p class="text-gray-700">
+                        总词语库: <span class="font-semibold">{{ wordBank.length }}</span> 个词语
+                    </p>
+                    <p class="text-gray-500 text-sm mt-1">
+                        已抽取: <span class="font-semibold">{{ selectedWords.length }}</span> 个词语
+                    </p>
+                </div>
+                <div class="flex gap-3">
+                    <button @click="copyToClipboard" class="btn-secondary" :disabled="selectedWords.length === 0">
+                        <i class="fa fa-copy mr-1"></i>复制词语
+                    </button>
+                    <button @click="drawWords" class="btn-primary">
+                        <i class="fa fa-random mr-1"></i>随机抽取
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 复制成功提示 -->
+            <div v-if="showCopySuccess" class="mt-4 p-3 bg-green-50 text-green-700 rounded-lg text-sm flex items-center animate-fade-in">
+                <i class="fa fa-check-circle mr-2"></i>
+                词语已成功复制到剪贴板
+            </div>
+        </div>
+        
+        <!-- 词语展示区域 -->
+        <div v-if="selectedWords.length > 0" class="bg-white rounded-xl p-6 shadow-md mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                <i class="fa fa-list-ul mr-2 text-primary"></i>
+                已抽取的30个词语
+            </h2>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                <div v-for="(word, index) in selectedWords" :key="index" class="word-card">
+                    <div class="flex items-center">
+                        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary text-xs flex items-center justify-center mr-2">
+                            {{ index + 1 }}
+                        </span>
+                        <span class="text-gray-800">{{ word }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 初始状态提示 -->
+        <div v-else class="bg-white rounded-xl p-8 shadow-md text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 text-gray-400 mb-4">
+                <i class="fa fa-random text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-800 mb-2">尚未抽取词语</h3>
+            <p class="text-gray-500 mb-6">点击"随机抽取"按钮从词语库中获取30个随机词语</p>
+            <button @click="drawWords" class="btn-primary">
+                <i class="fa fa-random mr-1"></i>开始抽取
+            </button>
+        </div>
+        
+        <!-- 页脚 -->
+        <footer class="text-center text-gray-500 text-sm mt-12">
+            <p>随机词语抽取工具 &copy; {{ new Date().getFullYear() }}</p>
+        </footer>
+    </div>
+
+    <script>
+        // 词语库 - 包含150个常用词语
+        const wordBank = [
+            "男人，人类", "女人,妇女", "脚，英尺", "牙", "儿童",
+            "手套", "人", "亲自", "人们", "老鼠",
+            "碟子，菜肴", "叶子，叶片", "纸，报纸，试卷，论文", "剪纸", "一张纸",
+            "学期论文", "国家，乡下", "火山", "方法，手段", "一系列",
+            "一系列（短语）", "鱼，鱼肉", "去钓鱼", "绝不", "借助什么手段",
+            "鹿", "羊，绵羊", "英雄", "马铃薯，土豆", "大学",
+            "上大学", "被大学录取，考上大学", "警察，警方", "班，阶级，等级", "课后",
+            "社会阶层", "家人，家庭", "全体职工", "中国人，汉语", "日本人，日语",
+            "英国人", "物种，种类"
+        ];
+
+        // 创建Vue应用
+        const { createApp } = Vue;
+        
+        createApp({
+            data() {
+                return {
+                    // 词语库
+                    wordBank: wordBank,
+                    // 选中的30个词语
+                    selectedWords: [],
+                    // 复制成功提示
+                    showCopySuccess: false
+                };
+            },
+            methods: {
+                // 随机抽取30个词语
+                drawWords() {
+                    // 复制词语库并打乱顺序
+                    const shuffled = [...this.wordBank].sort(() => 0.5 - Math.random());
+                    // 取前30个词语
+                    this.selectedWords = shuffled.slice(0, 30);
+                    // 隐藏复制提示
+                    this.showCopySuccess = false;
+                },
+                
+                // 复制词语到剪贴板
+                copyToClipboard() {
+                    if (this.selectedWords.length === 0) return;
+                    
+                    // 将词语连接成文本，每行一个
+                    const text = this.selectedWords.map((word, index) => `${index + 1}. ${word}`).join('\n');
+                    
+                    // 复制到剪贴板
+                    navigator.clipboard.writeText(text).then(() => {
+                        // 显示成功提示
+                        this.showCopySuccess = true;
+                        
+                        // 3秒后隐藏提示
+                        setTimeout(() => {
+                            this.showCopySuccess = false;
+                        }, 3000);
+                    });
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
+    
