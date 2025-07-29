@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Vocab Master</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6', // 蓝色作为主色调（代表知识和信任）
+                        secondary: '#F97316', // 橙色作为辅助色（用于强调和交互元素）
+                        neutral: '#1F2937', // 深灰色文本
+                        light: '#F9FAFB', // 浅色背景
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .transition-custom {
+                transition: all 0.3s ease-in-out;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen font-sans text-neutral">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- 页面头部 -->
+        <header class="text-center mb-8">
+            <h1 class="text-[clamp(2rem,5vw,3rem)] font-bold text-primary text-shadow mb-2">English Vocab Master</h1>
+            <p class="text-gray-600 text-lg">通过有趣的图片测试你的英语词汇量！</p>
+        </header>
+        
+        <!-- 游戏状态栏 -->
+        <div class="flex flex-wrap justify-between items-center mb-6 bg-white rounded-xl shadow-md p-4">
+            <div class="flex items-center gap-4 mb-2 sm:mb-0">
+                <div class="flex items-center gap-2">
+                    <i class="fa fa-trophy text-yellow-500 text-xl"></i>
+                    <span class="font-semibold">得分: <span id="score" class="text-primary">0</span></span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i class="fa fa-clock-o text-secondary text-xl"></i>
+                    <span class="font-semibold">时间: <span id="time" class="text-primary">30</span>秒</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <i class="fa fa-signal text-green-500 text-xl"></i>
+                    <span class="font-semibold">级别: <span id="level" class="text-primary">1</span></span>
+                </div>
+                <button id="restart-btn" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-custom flex items-center gap-2">
+                    <i class="fa fa-refresh"></i>
+                    <span>重新开始</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- 主要游戏区域 -->
+        <main class="bg-white rounded-2xl shadow-lg p-6 mb-8 transform transition-all duration-300 hover:shadow-xl">
+            <!-- 游戏开始屏幕 -->
+            <div id="start-screen" class="text-center py-10">
+                <h2 class="text-2xl font-bold mb-4 text-primary">欢迎来到词汇大师！</h2>
+                <p class="mb-6 text-gray-600">看图片并输入正确的英文单词。</p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4 mb-8">
+                    <button class="difficulty-btn bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition-custom" data-level="1">单词</button>
+                    <button class="difficulty-btn bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg transition-custom" data-level="2">词组</button>
+                    <button class="difficulty-btn bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg transition-custom" data-level="3">组合</button>
+                </div>
+                <button id="start-btn" class="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-custom transform hover:scale-105">
+                    开始游戏
+                </button>
+            </div>
+            
+            <!-- 游戏进行屏幕 -->
+            <div id="game-screen" class="hidden">
+                <!-- 图片容器 -->
+                <div class="mb-6 flex justify-center">
+                    <div class="relative w-full max-w-md h-64 bg-gray-100 rounded-xl overflow-hidden shadow-inner">
+                        <img id="vocab-image" src="" alt="词汇图片" class="w-full h-full object-cover">
+                        <div id="image-loading" class="absolute inset-0 bg-gray-100 flex items-center justify-center">
+                            <i class="fa fa-circle-o-notch fa-spin text-4xl text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 提示部分 -->
+                <div class="mb-4 text-center">
+                    <p class="text-gray-500 italic">提示: <span id="hint-text" class="font-medium text-gray-700">这是一个...</span></p>
+                </div>
+                
+                <!-- 输入部分 -->
+                <div class="mb-6">
+                    <form id="answer-form" class="flex flex-col sm:flex-row gap-3">
+                        <input 
+                            type="text" 
+                            id="answer-input" 
+                            placeholder="在这里输入你的答案..." 
+                            class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-custom"
+                            autocomplete="off"
+                        >
+                        <button 
+                            type="submit" 
+                            class="bg-secondary hover:bg-secondary/90 text-white px-6 py-3 rounded-lg transition-custom whitespace-nowrap"
+                        >
+                            检查答案
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- 反馈部分 -->
+                <div id="feedback" class="hidden text-center py-3 rounded-lg mb-4"></div>
+                
+                <!-- 控制按钮 -->
+                <div class="flex justify-center gap-4">
+                    <button id="hint-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg transition-custom flex items-center gap-2">
+                        <i class="fa fa-lightbulb-o"></i>
+                        <span>提示</span>
+                    </button>
+                    <button id="skip-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg transition-custom flex items-center gap-2">
+                        <i class="fa fa-forward"></i>
+                        <span>跳过</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 游戏结束屏幕 -->
+            <div id="game-over-screen" class="hidden text-center py-10">
+                <div class="mb-6 text-6xl">
+                    <i class="fa fa-trophy text-yellow-500 animate-bounce"></i>
+                </div>
+                <h2 class="text-2xl font-bold mb-2 text-primary">游戏结束！</h2>
+                <p class="text-xl mb-2">你的最终得分: <span id="final-score" class="font-bold text-secondary">0</span></p>
+                <p class="text-gray-600 mb-6">你达到了级别: <span id="final-level" class="font-bold text-primary">1</span></p>
+                <button id="play-again-btn" class="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-custom transform hover:scale-105">
+                    再玩一次
+                </button>
+            </div>
+        </main>
+        
+        <!-- 游戏说明 -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+            <h3 class="text-xl font-bold mb-3 text-primary flex items-center gap-2">
+                <i class="fa fa-info-circle"></i> 游戏说明
+            </h3>
+            <ul class="list-disc pl-5 text-gray-600 space-y-2">
+                <li>看屏幕上显示的图片</li>
+                <li>输入该图片对应的正确英文单词</li>
+                <li>每个单词有时间限制</li>
+                <li>正确回答可获得分数</li>
+                <li>随着游戏进行，难度会增加</li>
+                <li>遇到困难可以使用提示（会扣分！）</li>
+            </ul>
+        </div>
+        
+        <!-- 页脚 -->
+        <footer class="text-center text-gray-500 text-sm py-4">
+            <p>English Vocab Master - 通过趣味方式提升你的词汇量！</p>
+        </footer>
+    </div>
+
+    <script>
+        // 游戏数据 - 包含图片和提示的词汇
+        const vocabularyData = {
+            1: [ // 级别 1 - 简单
+                { word: "control", image: "https://ts1.tc.mm.bing.net/th/id/R-C.ade9e7dabfc9a9b48c383b20f1c24ef8?rik=MuOAqdcsZtGjUw&riu=http%3a%2f%2f5b0988e595225.cdn.sohucs.com%2fimages%2f20180806%2f31fb13b8f3b14a44889e61beebcf85cd.jpeg&ehk=fOCXPCZyLbQkvvKv4A3sNdQmaHsbaA8pTI5jqihZdNo%3d&risl=&pid=ImgRaw&r=0", hint: "控制" },
+                { word: "miss", image: "#", hint: "错过，想念" },
+                { word: "headache", image: "#", hint: "头痛" },
+                { word: "shut", image: "#", hint: "关闭，关上" },
+                { word: "happy", image: "#", hint: "幸福的快乐的" },
+                { word: "pretend", image: "#", hint: "假装" },
+                { word: "stair", image: "#", hint: "楼梯，阶梯" },
+                { word: "accident", image: "#", hint: "事故，偶然" },
+                { word: "event", image: "#", hint: "重大事情;比赛项目" },
+                { word: "matter", image: "#", hint: "事情;问题;物质" },
+                { word: "refuse", image: "#", hint: "拒绝" },
+                { word: "tap", image: "#", hint: "水龙头" },
+                { word: "duty", image: "#", hint: "责任,义务;值班" },
+                { word: "kind", image: "#", hint: "ad.善良的 n.种类" },
+                { word: "name", image: "#", hint: "n.名字.命名" },
+                { word: "land ", image: "#", hint: "n.陆地;土地 " },
+                { word: "already", image: "#", hint: "adv.已经" },
+                { word: "see", image: "#", hint: "v.看:看见:理解,领会" },
+                { word: "watch", image: "#", hint: "v,观看n.手表" },
+                { word: "waste", image: "#", hint: "m.浪费n.浪费;垃圾" },
+                { word: "have", image: "#", hint: "v.有;带有;举行;吃;喝;让" },
+                { word: "yet", image: "#", hint: "adv.尚,还" },
+                { word: "bound", image: "#", hint: "adi.必然的,肯定的;受约束的 " },
+                { word: "let", image: "#", hint: "v.让" },
+                { word: "next", image: "#", hint: "adj.下一个的;紧接着的" },
+                { word: "sit", image: "#", hint: "坐" },
+                { word: "seat", image: "#", hint: "n.座位" },
+                { word: "spend", image: "#", hint: "度过;花费(钱/时间等)" },
+                { word: "cost", image: "#", hint: "花费;使丧失,使损失" },
+                { word: "pay", image: "#", hint: "付费;付酬" },
+                { word: "fierce", image: "#", hint: "激烈的;凶猛的" },
+                { word: "aboard", image: "#", hint: "在船上;在……上" },
+                { word: "indoor", image: "#", hint: "室内的" },
+                { word: "Confucian", image: "#", hint: "儒家的:儒学的:孔子学说的" },
+                { word: "flash", image: "#", hint: "闪光;突然想到;闪现”" },
+            ],
+            2: [ // 级别 2 - 中等
+                { word: "shut up", image: "#", hint: "闭嘴" },
+                { word: "pretend to do sth.", image: "#", hint: "假装做某事 " },
+                { word: "pretend not to do sth.", image: "#", hint: "假装没做某事" },
+                { word: "up/down the stairs", image: "#", hint: "上/下楼梯" },
+                { word: "by accident", image: "#", hint: "偶然地,意外地 " },
+                { word: "refuse to do sth.", image: "#", hint: "拒绝做某事" },
+                { word: "tap water", image: "#", hint: "自来水 " },
+                { word: "on duty", image: "#", hint: "值班" },
+                { word: "all kinds of", image: "#", hint: "各种各样的" },
+                { word: "name after...", image: "#", hint: "以……命名" },
+                { word: "see sb.of ", image: "#", hint: "为某人送行 " },
+                { word: "see a doctor", image: "#", hint: "看医生" },
+                { word: "walch out", image: "#", hint: "留神,提防 " },
+                { word: "waste time(in)doing sth.", image: "#", hint: "浪费时间做某事" },
+                { word: "have to", image: "#", hint: "不得不,必须 " },
+                { word: "have something in common", image: "#", hint: "有共同点" },
+                { word: "be bound to do sth.", image: "#", hint: "必然会做某事" },
+                { word: "let sb.do sth.", image: "#", hint: "让某人做某事" },
+                { word: "next month", image: "#", hint: "下个月" },
+                { word: "take a seat", image: "#", hint: "坐下" },
+                { word: "be seated", image: "#", hint: "就座,坐下" },
+                { word: "spend+时间/金钱+on sth.", image: "#", hint: "花费时间/金钱在某事上" },
+                { word: "spend+时间+(in)doing sth.,", image: "#", hint: "花费时间做某事" },
+                { word: "pay for...", image: "#", hint: "付……的钱" },
+                // { word: "", image: "#", hint: "" },
+            ],
+            3: [ // 级别 3 - 困难
+                { word: "architecture", image: "https://picsum.photos/id/1031/500/300", hint: "设计建筑物的艺术" },
+                { word: "scientist", image: "https://picsum.photos/id/1074/500/300", hint: "研究科学的人" },
+                { word: "adventure", image: "https://picsum.photos/id/1036/500/300", hint: "一种令人兴奋的经历" },
+                { word: "technology", image: "https://picsum.photos/id/160/500/300", hint: "科学知识的应用" },
+                { word: "mysterious", image: "https://picsum.photos/id/1057/500/300", hint: "难以理解或解释的" },
+                { word: "environment", image: "https://picsum.photos/id/10/500/300", hint: "我们周围的自然世界" },
+                { word: "celebration", image: "https://picsum.photos/id/1060/500/300", hint: "纪念某个场合的特殊活动" },
+                { word: "philosophy", image: "https://picsum.photos/id/1070/500/300", hint: "研究生命意义的学科" }
+            ]
+        };
+        
+        // 游戏状态
+        const gameState = {
+            currentLevel: 1,
+            score: 0,
+            time: 30,
+            currentWordIndex: 0,
+            usedWords: [],
+            timer: null,
+            hintsUsed: 0,
+            gameStarted: false
+        };
+        
+        // DOM 元素
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const gameOverScreen = document.getElementById('game-over-screen');
+        const startBtn = document.getElementById('start-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const playAgainBtn = document.getElementById('play-again-btn');
+        const answerForm = document.getElementById('answer-form');
+        const answerInput = document.getElementById('answer-input');
+        const vocabImage = document.getElementById('vocab-image');
+        const hintText = document.getElementById('hint-text');
+        const feedback = document.getElementById('feedback');
+        const hintBtn = document.getElementById('hint-btn');
+        const skipBtn = document.getElementById('skip-btn');
+        const scoreDisplay = document.getElementById('score');
+        const timeDisplay = document.getElementById('time');
+        const levelDisplay = document.getElementById('level');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const finalLevelDisplay = document.getElementById('final-level');
+        const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+        const imageLoading = document.getElementById('image-loading');
+        
+        // 初始化游戏
+        function initGame() {
+            // 设置事件监听器
+            startBtn.addEventListener('click', startGame);
+            restartBtn.addEventListener('click', restartGame);
+            playAgainBtn.addEventListener('click', restartGame);
+            answerForm.addEventListener('submit', checkAnswer);
+            hintBtn.addEventListener('click', showHint);
+            skipBtn.addEventListener('click', skipWord);
+            
+            // 难度选择
+            difficultyBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // 移除所有按钮的活跃状态
+                    difficultyBtns.forEach(b => b.classList.remove('ring-4', 'ring-offset-2'));
+                    // 为点击的按钮添加活跃状态
+                    btn.classList.add('ring-4', 'ring-offset-2');
+                    // 根据数据属性设置级别
+                    gameState.currentLevel = parseInt(btn.dataset.level);
+                    levelDisplay.textContent = gameState.currentLevel;
+                });
+            });
+            
+            // 设置默认难度
+            difficultyBtns[0].click();
+        }
+        
+        // 开始游戏
+        function startGame() {
+            // 重置游戏状态
+            gameState.score = 0;
+            gameState.time = 30;
+            gameState.currentWordIndex = 0;
+            gameState.usedWords = [];
+            gameState.hintsUsed = 0;
+            gameState.gameStarted = true;
+            
+            // 更新显示
+            updateScore();
+            updateLevel();
+            
+            // 隐藏开始屏幕，显示游戏屏幕
+            startScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            
+            // 加载第一个单词
+            loadNextWord();
+            
+            // 开始计时器
+            startTimer();
+        }
+        
+        // 重新开始游戏
+        function restartGame() {
+            // 如果计时器在运行，停止它
+            if (gameState.timer) {
+                clearInterval(gameState.timer);
+                gameState.timer = null;
+            }
+            
+            // 重置游戏状态
+            gameState.gameStarted = false;
+            
+            // 隐藏其他屏幕，显示开始屏幕
+            gameScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            
+            // 重置显示
+            scoreDisplay.textContent = '0';
+            timeDisplay.textContent = '30';
+            levelDisplay.textContent = gameState.currentLevel;
+        }
+        
+        // 加载下一个单词
+        function loadNextWord() {
+            const currentLevelWords = vocabularyData[gameState.currentLevel];
+            
+            // 如果所有单词都用过了，升级
+            if (gameState.usedWords.length >= currentLevelWords.length) {
+                levelUp();
+                return;
+            }
+            
+            // 找到一个还没使用过的单词
+            let randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * currentLevelWords.length);
+            } while (gameState.usedWords.includes(randomIndex));
+            
+            gameState.currentWordIndex = randomIndex;
+            gameState.usedWords.push(randomIndex);
+            
+            // 加载单词数据
+            const currentWordData = currentLevelWords[randomIndex];
+            
+            // 显示加载指示器
+            imageLoading.classList.remove('hidden');
+            
+            // 设置图片和提示
+            vocabImage.src = currentWordData.image;
+            hintText.textContent = currentWordData.hint;
+            
+            // 图片加载完成后隐藏加载指示器
+            vocabImage.onload = () => {
+                imageLoading.classList.add('hidden');
+            };
+            
+            // 重置UI
+            answerInput.value = '';
+            feedback.classList.add('hidden');
+            answerInput.focus();
+            
+            // 根据级别重置时间
+            resetTimer();
+        }
+        
+        // 检查答案是否正确
+        function checkAnswer(e) {
+            e.preventDefault();
+            
+            if (!gameState.gameStarted) return;
+            
+            const userAnswer = answerInput.value.trim().toLowerCase();
+            const correctAnswer = vocabularyData[gameState.currentLevel][gameState.currentWordIndex].word;
+            
+            // 显示反馈
+            feedback.classList.remove('hidden');
+            
+            if (userAnswer === correctAnswer) {
+                // 正确答案
+                feedback.textContent = `正确！这是${correctAnswer}！`;
+                feedback.className = 'text-center py-3 rounded-lg mb-4 bg-green-100 text-green-800';
+                
+                // 添加分数（回答越快分数越高）
+                const points = Math.floor((gameState.time / 30) * 10) + 10;
+                gameState.score += points;
+                updateScore();
+                
+                // 短延迟后加载下一个单词
+                setTimeout(loadNextWord, 1500);
+            } else {
+                // 错误答案
+                feedback.textContent = `不正确。再试一次！`;
+                feedback.className = 'text-center py-3 rounded-lg mb-4 bg-red-100 text-red-800';
+                answerInput.value = '';
+                answerInput.focus();
+                
+                // 惩罚：减少时间
+                gameState.time = Math.max(5, gameState.time - 5);
+                timeDisplay.textContent = gameState.time;
+            }
+        }
+        
+        // 显示提示
+        function showHint() {
+            if (!gameState.gameStarted) return;
+            
+            const correctAnswer = vocabularyData[gameState.currentLevel][gameState.currentWordIndex].word;
+            
+            // 给出第一个字母作为提示
+            let hint = correctAnswer[0].toUpperCase();
+            
+            // 如果使用了多个提示，显示更多字母
+            for (let i = 1; i < gameState.hintsUsed + 1 && i < correctAnswer.length; i++) {
+                hint += correctAnswer[i];
+            }
+            
+            // 显示提示
+            feedback.textContent = `提示: ${hint}...`;
+            feedback.className = 'text-center py-3 rounded-lg mb-4 bg-blue-100 text-blue-800';
+            feedback.classList.remove('hidden');
+            
+            // 增加提示计数器
+            gameState.hintsUsed++;
+            
+            // 惩罚：减少分数
+            gameState.score = Math.max(0, gameState.score - 5);
+            updateScore();
+        }
+        
+        // 跳过当前单词
+        function skipWord() {
+            if (!gameState.gameStarted) return;
+            
+            // 惩罚：减少分数
+            gameState.score = Math.max(0, gameState.score - 10);
+            updateScore();
+            
+            loadNextWord();
+        }
+        
+        // 升级
+        function levelUp() {
+            // 检查是否达到最高级别
+            if (gameState.currentLevel >= Object.keys(vocabularyData).length) {
+                // 所有级别都完成了，继续使用最高级别
+                gameState.usedWords = [];
+                loadNextWord();
+            } else {
+                // 提升级别
+                gameState.currentLevel++;
+                gameState.usedWords = [];
+                updateLevel();
+                
+                // 显示升级消息
+                feedback.textContent = `恭喜！你达到了级别 ${gameState.currentLevel}！`;
+                feedback.className = 'text-center py-3 rounded-lg mb-4 bg-purple-100 text-purple-800';
+                feedback.classList.remove('hidden');
+                
+                // 短延迟后加载下一个单词
+                setTimeout(loadNextWord, 2000);
+            }
+        }
+        
+        // 开始计时器
+        function startTimer() {
+            if (gameState.timer) {
+                clearInterval(gameState.timer);
+            }
+            
+            gameState.timer = setInterval(() => {
+                gameState.time--;
+                timeDisplay.textContent = gameState.time;
+                
+                // 时间不多时改变颜色
+                if (gameState.time <= 10) {
+                    timeDisplay.classList.add('text-red-500');
+                } else {
+                    timeDisplay.classList.remove('text-red-500');
+                }
+                
+                // 时间用完游戏结束
+                if (gameState.time <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+        
+        // 重置计时器
+        function resetTimer() {
+            // 清除当前计时器
+            if (gameState.timer) {
+                clearInterval(gameState.timer);
+            }
+            
+            // 根据级别设置时间
+            gameState.time = 30 - (gameState.currentLevel - 1) * 5;
+            if (gameState.time < 10) gameState.time = 10;
+            
+            timeDisplay.textContent = gameState.time;
+            timeDisplay.classList.remove('text-red-500');
+            
+            // 重新开始计时器
+            startTimer();
+        }
+        
+        // 结束游戏
+        function endGame() {
+            // 停止计时器
+            if (gameState.timer) {
+                clearInterval(gameState.timer);
+                gameState.timer = null;
+            }
+            
+            gameState.gameStarted = false;
+            
+            // 更新最终得分显示
+            finalScoreDisplay.textContent = gameState.score;
+            finalLevelDisplay.textContent = gameState.currentLevel;
+            
+            // 隐藏游戏屏幕，显示游戏结束屏幕
+            gameScreen.classList.add('hidden');
+            gameOverScreen.classList.remove('hidden');
+        }
+        
+        // 更新分数显示
+        function updateScore() {
+            scoreDisplay.textContent = gameState.score;
+            
+            // 添加分数增加的动画
+            scoreDisplay.classList.add('scale-125', 'text-secondary');
+            setTimeout(() => {
+                scoreDisplay.classList.remove('scale-125', 'text-secondary');
+            }, 300);
+        }
+        
+        // 更新级别显示
+        function updateLevel() {
+            levelDisplay.textContent = gameState.currentLevel;
+            
+            // 添加级别增加的动画
+            levelDisplay.classList.add('scale-125', 'text-green-500');
+            setTimeout(() => {
+                levelDisplay.classList.remove('scale-125', 'text-green-500');
+            }, 500);
+        }
+        
+        // 页面加载完成后初始化游戏
+        window.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
